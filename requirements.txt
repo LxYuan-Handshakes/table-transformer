@@ -12,10 +12,14 @@ tqdm
 #cython
 numpy
 scikit-image
-#git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI
+cython
+git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI
 tensorboard
 tensorboardx
 scipy
 jupytext
 PyMuPDF
 
+
+# from thibaultvt / table-transformer-simple-inference
+#pytesseract
