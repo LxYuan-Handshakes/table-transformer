@@ -1,0 +1,21 @@
+jupyterlab
+jupyterlab-vim
+
+# convert these from environment.yml
+torch
+torchvision
+pandas
+#opencv 
+opencv-python
+scikit-learn
+tqdm
+#cython
+numpy
+scikit-image
+#git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI
+tensorboard
+tensorboardx
+scipy
+jupytext
+PyMuPDF
+
