@@ -1,5 +1,7 @@
+# optional
 jupyterlab
 jupyterlab-vim
+tabulate
 
 # convert these from environment.yml
 torch
