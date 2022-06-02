@@ -7,7 +7,7 @@ import torchvision.transforms.functional as F
 from torch import nn
 from PIL import Image
 import pandas as pd
-import cv2
+import numpy as np
 
 from util import helpers
 from datasets.transforms import Normalize
@@ -80,16 +80,16 @@ class TableDetector(nn.Module):
             return {0: "table", 1: "table rotated", 2: "no object"}
 
     def predict(
-        self, image_path: str, threshold: float = 0.5, padding: int = 50
+        self, image: Union[str, Image.Image], threshold: float = 0.5, padding: int = 50
     ) -> list[BoundingBox]:
         """Inference method for TableDetection model and to return list of
         table bounding-box if predicted score is equal or greather than
         threshold, empty list otherwise."""
 
-        image = image_path
-        if isinstance(image_path, str):
-            image = Image.open(image_path).convert("RGB")
-            image = helpers.add_padding(image, padding=padding)
+        if isinstance(image, str):
+            image = Image.open(image).convert("RGB")
+
+        image = helpers.add_padding(image, padding=padding)
 
         w, h = image.size
 
@@ -177,25 +177,26 @@ class TableStructure(nn.Module):
 
     def predict(
         self,
-        image_path: str,
+        image: Union[str, Image.Image],
         table_region: BoundingBox,
         threshold: float = 0.7,
         padding: int = 50,
         debug: bool = True,
-    ) -> pd.DataFrame:
+    ) -> Tuple[pd.DataFrame, np.ndarray]:
         """Inference method for TableStructure model and to a dataframe."""
 
-        if isinstance(image_path, str):
-            image = Image.open(image_path).convert("RGB")
-            xmin, ymin, xmax, ymax = table_region
-            crop_region = (
-                xmin - padding,
-                ymin - padding,
-                xmax + padding,
-                ymax + padding,
-            )
-            image = image.crop(crop_region)
-            image = helpers.add_padding(image, padding=padding)
+        if isinstance(image, str):
+            image = Image.open(image).convert("RGB")
+
+        xmin, ymin, xmax, ymax = table_region
+        crop_region = (
+            xmin - padding,
+            ymin - padding,
+            xmax + padding,
+            ymax + padding,
+        )
+        image = image.crop(crop_region)
+        image = helpers.add_padding(image, padding=padding)
 
         w, h = image.size
 
@@ -235,11 +236,8 @@ class TableStructure(nn.Module):
 
         if debug:
             visualization = helpers.visualize_structure(image, objs)
-            out_path = image_path[:-4] + "_visualisation.jpg"
-            cv2.imwrite(out_path, visualization)
-            print(f"Visualization can be found at '{out_path}'.")
 
-        return df
+        return df, visualization
 
 
 class TableRecogniser(nn.Module):
@@ -275,20 +273,22 @@ class TableRecogniser(nn.Module):
 
     def predict(
         self,
-        image_path: str,
+        image: Union[str, Image.Image],
         detector_threshold: float = 0.5,
         structure_threshold: float = 0.7,
-    ) -> list[pd.DataFrame]:
+    ) -> Tuple[list[pd.DataFrame], list[np.ndarray]]:
         """Inference method to call TableDetector.predict() and pass the
         output to TableStructure.predict() and return list of dataframe."""
 
-        bounding_box_table = self.detector_model.predict(image_path, detector_threshold)
+        bounding_box_table = self.detector_model.predict(image, detector_threshold)
 
-        outputs = []
+        dataframes = []
+        images = []
         for table_bbox in bounding_box_table:
-            dataframe = self.structure_model.predict(
-                image_path, table_bbox, structure_threshold
+            dataframe, visualised_image = self.structure_model.predict(
+                image, table_bbox, structure_threshold
             )
-            outputs.append(dataframe)
+            dataframes.append(dataframe)
+            images.append(visualised_image)
 
-        return outputs
+        return dataframes, images
