@@ -227,7 +227,7 @@ def get_model(args, device):
     model, criterion, postprocessors = build_model(args)
     model.to(device)
     if args.model_load_path:
-        print("loading model from checkpoint: {args['model_load_path']}")
+        print(f"loading model from checkpoint: {args['model_load_path']}")
         loaded_state_dict = torch.load(args.model_load_path, map_location=device)
         model_state_dict = model.state_dict()
         pretrained_dict = {
