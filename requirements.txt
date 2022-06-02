@@ -1,13 +1,14 @@
 # optional
-jupyterlab
-jupyterlab-vim
-tabulate
+#jupyterlab
+#jupyterlab-vim
+#tabulate
+#gradio==2.9b7
 
 # convert these from environment.yml
 torch
 torchvision
 pandas
-#opencv 
+#opencv
 opencv-python
 scikit-learn
 tqdm
