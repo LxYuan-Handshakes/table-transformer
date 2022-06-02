@@ -90,7 +90,6 @@ def get_cells(objs):
 def structure_table(objs, table_bbox):
     rows, cols = get_rows_and_columns(objs)
 
-    print(f"{table_bbox}")
     #   initial values are top and most left coordinates
     p_xmin, p_ymin, p_xmax, p_ymax = table_bbox
     p_ymax = p_ymin
